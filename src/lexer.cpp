@@ -19,7 +19,7 @@ namespace bccc
         }
 
         std::regex iden("[a-zA-Z][a-zA-Z0-9_]*");
-        std::regex lit("^[0-9]+$");
+        std::regex lit("^([1-9][0-9]*|0[0-7]+|0x[0-9a-f]+)$");
         //std::regex;
 
         if (std::regex_match(buffer, iden))
