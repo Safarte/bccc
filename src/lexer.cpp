@@ -18,19 +18,6 @@ namespace bccc
             }
         }
 
-        std::regex iden("[a-zA-Z][a-zA-Z0-9_]*");
-        std::regex lit("^([1-9][0-9]*|0[0-7]+|0x[0-9a-f]+)$");
-        //std::regex;
-
-        if (std::regex_match(buffer, iden))
-        {
-            return Token(buffer, Token::Type::Identifier);
-        }
-        if (std::regex_match(buffer, lit))
-        {
-            return Token(buffer, Token::Type::Literal);
-        }
-
         /* No support for comments yet*/
 
         /* Will only reach here if all else fails, invalid string */
@@ -87,8 +74,6 @@ namespace bccc
                 buffer += ch;
             }
         }
-
-        //std::cout << line << "\n";
 
         return tokens;
     }
