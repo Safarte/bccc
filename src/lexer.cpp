@@ -7,7 +7,7 @@
 
 namespace bccc
 {
-    Token getToken(const std::string& buffer, LineNo line)
+    Token getToken(const std::string &buffer, LineNo line)
     {
         for (const auto &thing : bccc::getClassifiers())
         {
@@ -26,7 +26,7 @@ namespace bccc
         exit(0);
     }
 
-    std::vector<Token> Tokenize(const std::string& filename)
+    std::vector<Token> Tokenize(const std::string &filename)
     {
         std::ifstream file(filename, std::ios::in);
 
@@ -59,9 +59,7 @@ namespace bccc
                 }
                 tokens.emplace_back(std::string(1, ch), Token::Type::Delimiter);
                 continue;
-            }
-
-            else if (whitespace.find(ch) != whitespace.end())
+            } else if (whitespace.find(ch) != whitespace.end())
             {
                 if (!buffer.empty())
                 {
@@ -69,8 +67,7 @@ namespace bccc
                     buffer = "";
                 }
                 continue;
-            }
-            else
+            } else
             {
                 buffer += ch;
             }
