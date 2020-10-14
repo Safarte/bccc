@@ -9,8 +9,8 @@
 using LineNo = unsigned int;
 namespace bccc
 {
-    std::vector<Token> Tokenize(std::string filename);
-    Token getToken(std::string buffer, LineNo line);
+    std::vector<Token> Tokenize(const std::string& filename);
+    Token getToken(const std::string& buffer, LineNo line);
 }
 
 

@@ -1,3 +1,3 @@
 int main() {
-    return 0x2;
+    return 2020;
 }

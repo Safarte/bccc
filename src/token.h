@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_set>
+#include <utility>
 
 namespace bccc
 {
@@ -13,24 +14,21 @@ namespace bccc
             Delimiter,
             Keyword,
             Identifier,
-            Literal
+            IntLiteral,
+            HexLiteral,
+            OctLiteral
         };
         Type type;
         std::string value;
 
         Token() = delete;
 
-        Token(const std::string &tokenValue_, Type tokenType_) : value(tokenValue_), type(tokenType_)
+        Token(std::string tokenValue_, Type tokenType_) : value(std::move(tokenValue_)), type(tokenType_)
         { /* empty */
         }
 
-        Token(const Token &token) : value(token.value), type(token.type)
-        { /* empty */
-        }
+        Token(const Token &token) = default;
     };
-
-    static const std::unordered_set<char> delims = {'{', '}', '(', ')', ';'};
-    static const std::unordered_set<char> whitespace = {'\n', '\r', '\t', ' '};
 } // namespace bccc
 
 #endif

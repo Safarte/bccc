@@ -4,13 +4,12 @@
 
 #include <fstream>
 #include <iostream>
-#include <regex>
 
 namespace bccc
 {
-    Token getToken(std::string buffer, LineNo line)
+    Token getToken(const std::string& buffer, LineNo line)
     {
-        for (const auto &thing : classifiers)
+        for (const auto &thing : bccc::getClassifiers())
         {
             if (thing.among(buffer))
             {
@@ -27,7 +26,7 @@ namespace bccc
         exit(0);
     }
 
-    std::vector<Token> Tokenize(std::string filename)
+    std::vector<Token> Tokenize(const std::string& filename)
     {
         std::ifstream file(filename, std::ios::in);
 
@@ -39,10 +38,12 @@ namespace bccc
         }
 
         LineNo line = 1;
-        std::string buffer = "";
+        std::string buffer;
 
         char ch;
         std::vector<Token> tokens;
+        const std::unordered_set<char> delims = {'{', '}', '(', ')', ';'};
+        const std::unordered_set<char> whitespace = {'\n', '\r', '\t', ' '};
 
         while (file >> std::noskipws >> ch)
         {
@@ -51,18 +52,18 @@ namespace bccc
 
             if (delims.find(ch) != delims.end())
             {
-                if (buffer != "")
+                if (!buffer.empty())
                 {
                     tokens.push_back(getToken(buffer, line));
                     buffer = "";
                 }
-                tokens.push_back(Token(std::string(1, ch), Token::Type::Delimiter));
+                tokens.emplace_back(std::string(1, ch), Token::Type::Delimiter);
                 continue;
             }
 
             else if (whitespace.find(ch) != whitespace.end())
             {
-                if (buffer != "")
+                if (!buffer.empty())
                 {
                     tokens.push_back(getToken(buffer, line));
                     buffer = "";
