@@ -1,3 +1,3 @@
 int main() {
-    return 0x42;
+    return !12;
 }
