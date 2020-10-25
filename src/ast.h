@@ -25,10 +25,18 @@ namespace bccc
         Add,
         Sub,
         Mul,
-        Div
+        Div,
+        LAnd,
+        LOr,
+        Eq,
+        Ne,
+        Lt,
+        Le,
+        Gt,
+        Ge
     };
 
-    std::map<int, char> getBinaryOpChar();
+    std::map<int, std::string> getBinaryOpChar();
 
     struct AST;
 

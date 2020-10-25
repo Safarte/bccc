@@ -5,11 +5,13 @@
 #include "ast.h"
 
 #include <string>
+#include <utility>
 
 namespace bccc
 {
-    std::string emitOperands(AST &op1, AST &op2);
-    std::string emitExpression(AST &expression);
+    std::pair<std::string, int> emitOperands(AST &op1, AST &op2, int counter = 0);
+    std::pair<std::string, int> emitComp(AST &op1, AST &op2, int counter = 0);
+    std::pair<std::string, int> emitExpression(AST &expression, int counter = 0);
     std::string emitReturn(AST &ret);
     std::string emitStatement(AST &statement);
     std::string emitFunction(AST &function);

@@ -26,7 +26,7 @@ namespace bccc
 
             if (!token.isSymbol(eSymbol::ClosingParen))
             {
-                throw std::runtime_error("Missing closing parenthesis");
+                std::cout << "Missing closing parenthesis";
             }
 
             return {expr, tokens};
@@ -47,7 +47,8 @@ namespace bccc
                     op = eUnaryOp::BitwiseNot;
                     break;
                 default:
-                    throw std::runtime_error("Unknown unary operator");
+                    std::cout << "Unknown unary operator";
+                    exit(0);
             }
 
             auto[factor, newTokens] = parseFactor(tokens);
@@ -62,7 +63,8 @@ namespace bccc
             auto node = AST(Int{value.n});
             return {node, tokens};
         }
-        throw std::runtime_error("Invalid expression");
+        std::cout << "Invalid expression";
+        exit(0);
     }
 
     std::pair<AST, Tokens> parseTerm(Tokens &tokens_)
@@ -86,7 +88,8 @@ namespace bccc
                     op = eBinaryOp::Div;
                     break;
                 default:
-                    throw std::runtime_error("Unknown binary operator");
+                    std::cout << "Unknown binary operator";
+                    exit(0);
             }
 
             auto[nextFactor, newTokens] = parseFactor(tokens);
@@ -100,12 +103,11 @@ namespace bccc
         return {factor, tokens};
     }
 
-    std::pair<AST, Tokens> parseExpression(Tokens &tokens_)
+    std::pair<AST, Tokens> parseAddExpr(Tokens &tokens_)
     {
         auto[term, tokens] = parseTerm(tokens_);
 
         auto token = tokens.front();
-
 
         while (token.isSymbol(eSymbol::Add) || token.isSymbol(eSymbol::Sub))
         {
@@ -122,7 +124,8 @@ namespace bccc
                     op = eBinaryOp::Sub;
                     break;
                 default:
-                    throw std::runtime_error("Unknown binary operator");
+                    std::cout << "Unknown binary operator";
+                    exit(0);
             }
 
             auto[nextTerm, newTokens] = parseTerm(tokens);
@@ -134,6 +137,132 @@ namespace bccc
         }
 
         return {term, tokens};
+    }
+
+    std::pair<AST, Tokens> parseRelExpr(Tokens &tokens_)
+    {
+        auto[addExpr, tokens] = parseAddExpr(tokens_);
+
+        auto token = tokens.front();
+
+        while (token.isSymbol(eSymbol::Lt) || token.isSymbol(eSymbol::Le) || token.isSymbol(eSymbol::Gt) ||
+               token.isSymbol(eSymbol::Ge))
+        {
+            tokens.pop_front();
+
+            auto symbol = std::get<Symbol>(token.kind);
+            eBinaryOp op;
+            switch (symbol.symbol)
+            {
+                case eSymbol::Lt:
+                    op = eBinaryOp::Lt;
+                    break;
+                case eSymbol::Le:
+                    op = eBinaryOp::Le;
+                    break;
+                case eSymbol::Gt:
+                    op = eBinaryOp::Gt;
+                    break;
+                case eSymbol::Ge:
+                    op = eBinaryOp::Ge;
+                    break;
+                default:
+                    std::cout << "Unknown binary operator";
+                    exit(0);
+            }
+
+            auto[nextAddExpr, newTokens] = parseAddExpr(tokens);
+            tokens = newTokens;
+
+            addExpr.setKind(BinaryOp{op, std::make_unique<AST>(addExpr), std::make_unique<AST>(nextAddExpr)});
+
+            token = tokens.front();
+        }
+
+        return {addExpr, tokens};
+    }
+
+    std::pair<AST, Tokens> parseEqExpr(Tokens &tokens_)
+    {
+        auto[relExpr, tokens] = parseRelExpr(tokens_);
+
+        auto token = tokens.front();
+
+        while (token.isSymbol(eSymbol::Eq) || token.isSymbol(eSymbol::Ne))
+        {
+            tokens.pop_front();
+
+            auto symbol = std::get<Symbol>(token.kind);
+            eBinaryOp op;
+            switch (symbol.symbol)
+            {
+                case eSymbol::Eq:
+                    op = eBinaryOp::Eq;
+                    break;
+                case eSymbol::Ne:
+                    op = eBinaryOp::Ne;
+                    break;
+                default:
+                    std::cout << "Unknown binary operator";
+                    exit(0);
+            }
+
+            auto[nextRelExpr, newTokens] = parseRelExpr(tokens);
+            tokens = newTokens;
+
+            relExpr.setKind(BinaryOp{op, std::make_unique<AST>(relExpr), std::make_unique<AST>(nextRelExpr)});
+
+            token = tokens.front();
+        }
+
+        return {relExpr, tokens};
+    }
+
+    std::pair<AST, Tokens> parseAndExpr(Tokens &tokens_)
+    {
+        auto[eqExpr, tokens] = parseEqExpr(tokens_);
+
+        auto token = tokens.front();
+
+        while (token.isSymbol(eSymbol::LogicalAnd))
+        {
+            tokens.pop_front();
+
+            auto op = eBinaryOp::LAnd;
+
+            auto[nextEqExpr, newTokens] = parseEqExpr(tokens);
+            tokens = newTokens;
+
+            eqExpr.setKind(BinaryOp{op, std::make_unique<AST>(eqExpr), std::make_unique<AST>(nextEqExpr)});
+
+            token = tokens.front();
+        }
+
+        return {eqExpr, tokens};
+    }
+
+    std::pair<AST, Tokens> parseExpression(Tokens &tokens_)
+    {
+        auto[andExpr, tokens] = parseAndExpr(tokens_);
+
+        auto token = tokens.front();
+
+
+        while (token.isSymbol(eSymbol::LogicalOr))
+        {
+            tokens.pop_front();
+
+            auto op = eBinaryOp::LOr;
+
+            auto[nextAndExpr, newTokens] = parseAndExpr(tokens);
+            tokens = newTokens;
+
+            andExpr.setKind(BinaryOp{op, std::make_unique<AST>(andExpr), std::make_unique<AST>(nextAndExpr)});
+
+            token = tokens.front();
+        }
+
+        return {andExpr, tokens};
     }
 
     std::pair<AST, Tokens> parseStatement(Tokens &tokens_)
@@ -158,7 +287,8 @@ namespace bccc
             std::cout << "Missing semicolon";
             exit(0);
         }
-        throw std::runtime_error("'return' keyword expected");
+        std::cout << "'return' keyword expected";
+        exit(0);
     }
 
     std::pair<std::vector<Identifier>, Tokens> parseArguments(Tokens &tokens_)
@@ -177,9 +307,11 @@ namespace bccc
                 std::vector<Identifier> args;
                 return {args, tokens};
             }
-            throw std::runtime_error("Missing closing parenthesis");
+            std::cout << "Missing closing parenthesis";
+            exit(0);
         }
-        throw std::runtime_error("Missing opening parenthesis");
+        std::cout << "Missing opening parenthesis";
+        exit(0);
     }
 
     std::pair<AST, Tokens> parseFunction(Tokens &tokens_)
@@ -195,7 +327,8 @@ namespace bccc
 
             if (!token.isIdentifier())
             {
-                throw std::runtime_error("Missing function name identifier");
+                std::cout << "Missing function name identifier";
+                exit(0);
             }
 
             auto identifier = std::get<Identifier>(token.kind);
@@ -220,11 +353,14 @@ namespace bccc
                     auto node = AST(FuncDef{name, std::make_unique<AST>(statement)});
                     return {node, tokens};
                 }
-                throw std::runtime_error("Missing closing braces");
+                std::cout << "Missing closing braces";
+                exit(0);
             }
-            throw std::runtime_error("Missing opening braces");
+            std::cout << "Missing opening braces";
+            exit(0);
         }
-        throw std::runtime_error("'int' keyword expected");
+        std::cout << "'int' keyword expected";
+        exit(0);
     }
 
     AST parseProgram(Tokens &tokens_)
@@ -235,7 +371,8 @@ namespace bccc
 
         if (!tokens.empty())
         {
-            throw std::runtime_error("Unexpected tokens at end of program");
+            std::cout << "Unexpected tokens at end of program";
+            exit(0);
         }
 
         return ast;

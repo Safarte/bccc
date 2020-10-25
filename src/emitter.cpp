@@ -3,24 +3,40 @@
 
 #include <string>
 #include <sstream>
+#include <utility>
 
 namespace bccc
 {
-    std::string emitOperands(AST &op1, AST &op2)
+    std::pair<std::string, int> emitOperands(AST &op1, AST &op2, int counter)
     {
         std::stringstream ss;
 
-        ss << emitExpression(op1);
+        auto[expr1, counter1] = emitExpression(op1, counter);
+        ss << expr1;
         ss << "\tpush\t%rax\n";
-        ss << emitExpression(op2);
+        auto[expr2, counter2] = emitExpression(op2, counter1);
+        ss << expr2;
         ss << "\tpop\t%rcx\n";
 
-        return ss.str();
+        return { ss.str(), counter2 };
     }
 
-    std::string emitExpression(AST &expression)
+    std::pair<std::string, int> emitComp(AST &op1, AST &op2, int counter)
     {
         std::stringstream ss;
+
+        auto[expr, counter_] = emitOperands(op1, op2, counter);
+        ss << expr;
+        ss << "\tcmpl\t%eax, %ecx\n";
+        ss << "\tmovl\t$0, %eax\n";
+
+        return { ss.str(), counter_ };
+    }
+
+    std::pair<std::string, int> emitExpression(AST &expression, int counter)
+    {
+        std::stringstream ss;
+        int counter_ = counter;
 
         if (expression.isInt())
         {
@@ -32,7 +48,9 @@ namespace bccc
         {
             auto[op, operand] = std::get<UnaryOp>(std::move(expression.kind));
 
-            ss << emitExpression(*operand);
+            auto[expr, counter1] = emitExpression(*operand, counter);
+            counter_ = counter1;
+            ss << expr;
 
             switch (op)
             {
@@ -57,26 +75,126 @@ namespace bccc
             switch(op)
             {
                 case eBinaryOp::Add:
-                    ss << emitOperands(*lOperand, *rOperand);
+                {
+                    auto[expr, counter1] = emitOperands(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
                     ss << "\taddl\t%ecx, %eax\n";
                     break;
+                }
                 case eBinaryOp::Sub:
-                    ss << emitOperands(*rOperand, *lOperand);
+                {
+                    auto[expr, counter1] = emitOperands(*rOperand, *lOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
                     ss << "\tsubl\t%ecx, %eax\n";
                     break;
+                }
                 case eBinaryOp::Mul:
-                    ss << emitOperands(*lOperand, *rOperand);
+                {
+                    auto[expr, counter1] = emitOperands(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
                     ss << "\timul\t%ecx, %eax\n";
                     break;
+                }
                 case eBinaryOp::Div:
-                    ss << emitOperands(*rOperand, *lOperand);
+                {
+                    auto[expr, counter1] = emitOperands(*rOperand, *lOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
                     ss << "\tcdq\n";
                     ss << "\tidiv\t%ecx\n";
                     break;
+                }
+                case eBinaryOp::LAnd:
+                {
+                    auto[expr1, counter1] = emitExpression(*lOperand, counter);
+                    ss << expr1;
+                    ss << "\tcmpl\t$0, %eax\n";
+                    ss << "\tjne\t_" << counter1 << "\n";
+                    ss << "\tmovl\t$1, %eax\n";
+                    auto[expr2, counter2] = emitExpression(*rOperand, counter1 + 1);
+                    ss << "\tjmp\t_" << counter2 << "\n";
+                    ss << "_" << counter1 << ":\n";
+                    ss << expr2;
+                    ss << "\tcmpl\t$0, %eax\n";
+                    ss << "\tmovl\t$0, %eax\n";
+                    ss << "\tsetne\t%al\n";
+                    ss << "_" << counter2 << ":\n";
+                    counter_ = counter2 + 1;
+                    break;
+                }
+                case eBinaryOp::LOr:
+                {
+                    auto[expr1, counter1] = emitExpression(*lOperand, counter);
+                    ss << expr1;
+                    ss << "\tcmpl\t$0, %eax\n";
+                    ss << "\tje\t_" << counter1 << "\n";
+                    ss << "\tmovl\t$1, %eax\n";
+                    auto[expr2, counter2] = emitExpression(*rOperand, counter1 + 1);
+                    ss << "\tjmp\t_" << counter2 << "\n";
+                    ss << "_" << counter1 << ":\n";
+                    ss << expr2;
+                    ss << "\tcmpl\t$0, %eax\n";
+                    ss << "\tmovl\t$0, %eax\n";
+                    ss << "\tsetne\t%al\n";
+                    ss << "_" << counter2 << ":\n";
+                    counter_ = counter2 + 1;
+                    break;
+                }
+                case eBinaryOp::Eq:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsete\t%al\n";
+                    break;
+                }
+                case eBinaryOp::Ne:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsetne\t%al\n";
+                    break;
+                }
+                case eBinaryOp::Lt:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsetl\t%al\n";
+                    break;
+                }
+                case eBinaryOp::Le:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsetle\t%al\n";
+                    break;
+                }
+                case eBinaryOp::Gt:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsetg\t%al\n";
+                    break;
+                }
+                case eBinaryOp::Ge:
+                {
+                    auto[expr, counter1] = emitComp(*lOperand, *rOperand, counter);
+                    counter_ = counter1;
+                    ss << expr;
+                    ss << "\tsetge\t%al\n";
+                    break;
+                }
             }
         }
 
-        return ss.str();
+        return { ss.str(), counter_ };
     }
 
     std::string emitReturn(AST &ret)
@@ -85,7 +203,7 @@ namespace bccc
 
         auto[expr] = std::get<Return>(std::move(ret.kind));
 
-        ss << emitExpression(*expr);
+        ss << emitExpression(*expr).first;
 
         ss << "\tret\n";
 

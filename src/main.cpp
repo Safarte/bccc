@@ -12,9 +12,15 @@ int main(int argc, char* argv[])
     std::string fName{argv[1]};
     auto tokens = bccc::Tokenize(fName);
 
+    for (auto t: tokens)
+    {
+        std::cout << t << " ";
+    }
+    std::cout << std::endl;
+
     auto ast = bccc::parseProgram(tokens);
 
-//    std::cout << ast;
+    //std::cout << ast;
 
     auto assembly = bccc::emitProgram(ast);
 

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 namespace bccc
 {
@@ -14,13 +15,21 @@ namespace bccc
         };
     }
 
-    std::map<int, char> getBinaryOpChar()
+    std::map<int, std::string> getBinaryOpChar()
     {
-        return std::map<int, char>{
-                {0, '+'},
-                {1, '-'},
-                {2, '*'},
-                {3, '/'}
+        return std::map<int, std::string>{
+                {0, "+"},
+                {1, "-"},
+                {2, "*"},
+                {3, "/"},
+                {4, "&&"},
+                {5, "||"},
+                {6, "=="},
+                {7, "!="},
+                {8, "<"},
+                {9, "<="},
+                {10, ">"},
+                {11, ">="}
         };
     }
 

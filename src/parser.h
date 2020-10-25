@@ -14,6 +14,10 @@ namespace bccc
 {
     std::pair<AST, Tokens> parseFactor(Tokens &tokens);
     std::pair<AST, Tokens> parseTerm(Tokens &tokens);
+    std::pair<AST, Tokens> parseAddExpr(Tokens &tokens);
+    std::pair<AST, Tokens> parseRelExpr(Tokens &tokens);
+    std::pair<AST, Tokens> parseEqExpr(Tokens &tokens);
+    std::pair<AST, Tokens> parseAndExpr(Tokens &tokens);
     std::pair<AST, Tokens> parseExpression(Tokens &tokens);
     std::pair<AST, Tokens> parseStatement(Tokens &tokens);
     std::pair<std::vector<Identifier>, Tokens> parseArguments(Tokens &tokens_);

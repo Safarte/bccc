@@ -27,7 +27,21 @@ namespace bccc
         Add,
         Sub,
         Asterisk,
-        Div
+        Div,
+        LogicalAnd,
+        LogicalOr,
+        Eq,
+        Ne,
+        Lt,
+        Le,
+        Gt,
+        Ge,
+        Mod,
+        And,
+        Or,
+        Xor,
+        Shl,
+        Shr
     };
 
     std::map<int, std::string> getSymbolStr();
