@@ -6,6 +6,8 @@
 #include <variant>
 #include <string>
 #include <memory>
+#include <iostream>
+#include <map>
 
 namespace bccc
 {
@@ -16,6 +18,18 @@ namespace bccc
         LogicalNot
     };
 
+    std::map<int, char> getUnaryOpChar();
+
+    enum class eBinaryOp
+    {
+        Add,
+        Sub,
+        Mul,
+        Div
+    };
+
+    std::map<int, char> getBinaryOpChar();
+
     struct AST;
 
     struct FuncDef
@@ -23,17 +37,26 @@ namespace bccc
         std::string name;
         std::unique_ptr<AST> body;
     };
+
     struct UnaryOp
     {
         eUnaryOp op;
         std::unique_ptr<AST> operand;
     };
+
+    struct BinaryOp
+    {
+        eBinaryOp op;
+        std::unique_ptr<AST> leftOperand;
+        std::unique_ptr<AST> rightOperand;
+    };
+
     struct Return
     {
         std::unique_ptr<AST> expression;
     };
 
-    using ASTKind = std::variant<FuncDef, Int, UnaryOp, Return>;
+    using ASTKind = std::variant<FuncDef, Int, UnaryOp, BinaryOp, Return>;
 
     struct AST
     {
@@ -44,6 +67,8 @@ namespace bccc
         explicit AST(ASTKind kind_) : kind(std::move(kind_)) {}
 
         AST(AST &ast_) : kind(std::move(ast_.kind)) {}
+
+        void setKind(ASTKind kind_);
 
         bool isFuncDef() const
         {
@@ -60,11 +85,18 @@ namespace bccc
             return kind.index() == 2;
         }
 
-        bool isReturn() const
+        bool isBinaryOp() const
         {
             return kind.index() == 3;
         }
+
+        bool isReturn() const
+        {
+            return kind.index() == 4;
+        }
     };
+
+    std::ostream& operator<<(std::ostream &os, AST &ast);
 }
 
 #endif //BCCC_AST_H

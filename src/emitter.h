@@ -8,6 +8,7 @@
 
 namespace bccc
 {
+    std::string emitOperands(AST &op1, AST &op2);
     std::string emitExpression(AST &expression);
     std::string emitReturn(AST &ret);
     std::string emitStatement(AST &statement);

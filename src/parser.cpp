@@ -6,22 +6,32 @@
 #include <string>
 #include <utility>
 #include <memory>
+#include <iostream>
 
 namespace bccc
 {
-    std::pair<AST, Tokens> parseExpression(Tokens &tokens_)
+    std::pair<AST, Tokens> parseFactor(Tokens &tokens_)
     {
         auto tokens = tokens_;
         Token token = tokens.front();
         tokens.pop_front();
 
-        if (token.isInt())
+        if (token.isSymbol(eSymbol::OpeningParen))
         {
-            auto value = std::get<Int>(token.kind);
-            auto node = AST(Int{value.n});
-            return {node, tokens};
+            auto[expr, newTokens] = parseExpression(tokens);
+            tokens = newTokens;
+
+            token = tokens.front();
+            tokens.pop_front();
+
+            if (!token.isSymbol(eSymbol::ClosingParen))
+            {
+                throw std::runtime_error("Missing closing parenthesis");
+            }
+
+            return {expr, tokens};
         }
-        if (token.isSymbol())  // Token is a Symbol
+        if (token.isUnaryOp())
         {
             auto symbol = std::get<Symbol>(token.kind);
             eUnaryOp op;
@@ -37,16 +47,93 @@ namespace bccc
                     op = eUnaryOp::BitwiseNot;
                     break;
                 default:
-                    throw std::runtime_error("Unknown symbol");
+                    throw std::runtime_error("Unknown unary operator");
             }
 
-            auto[expr, newTokens] = parseExpression(tokens);
+            auto[factor, newTokens] = parseFactor(tokens);
             tokens = newTokens;
-            auto node = AST(UnaryOp{op, std::make_unique<AST>(expr)});
 
+            auto node = AST(UnaryOp{op, std::make_unique<AST>(factor)});
+            return {node, tokens};
+        }
+        if (token.isInt())
+        {
+            auto value = std::get<Int>(token.kind);
+            auto node = AST(Int{value.n});
             return {node, tokens};
         }
         throw std::runtime_error("Invalid expression");
+    }
+
+    std::pair<AST, Tokens> parseTerm(Tokens &tokens_)
+    {
+        auto[factor, tokens] = parseFactor(tokens_);
+
+        auto token = tokens.front();
+
+        while (token.isSymbol(eSymbol::Asterisk) || token.isSymbol(eSymbol::Div))
+        {
+            tokens.pop_front();
+
+            auto symbol = std::get<Symbol>(token.kind);
+            eBinaryOp op;
+            switch (symbol.symbol)
+            {
+                case eSymbol::Asterisk:
+                    op = eBinaryOp::Mul;
+                    break;
+                case eSymbol::Div:
+                    op = eBinaryOp::Div;
+                    break;
+                default:
+                    throw std::runtime_error("Unknown binary operator");
+            }
+
+            auto[nextFactor, newTokens] = parseFactor(tokens);
+            tokens = newTokens;
+
+            factor.setKind(BinaryOp{op, std::make_unique<AST>(factor), std::make_unique<AST>(nextFactor)});
+
+            token = tokens.front();
+        }
+
+        return {factor, tokens};
+    }
+
+    std::pair<AST, Tokens> parseExpression(Tokens &tokens_)
+    {
+        auto[term, tokens] = parseTerm(tokens_);
+
+        auto token = tokens.front();
+
+
+        while (token.isSymbol(eSymbol::Add) || token.isSymbol(eSymbol::Sub))
+        {
+            tokens.pop_front();
+
+            auto symbol = std::get<Symbol>(token.kind);
+            eBinaryOp op;
+            switch (symbol.symbol)
+            {
+                case eSymbol::Add:
+                    op = eBinaryOp::Add;
+                    break;
+                case eSymbol::Sub:
+                    op = eBinaryOp::Sub;
+                    break;
+                default:
+                    throw std::runtime_error("Unknown binary operator");
+            }
+
+            auto[nextTerm, newTokens] = parseTerm(tokens);
+            tokens = newTokens;
+
+            term.setKind(BinaryOp{op, std::make_unique<AST>(term), std::make_unique<AST>(nextTerm)});
+
+            token = tokens.front();
+        }
+
+        return {term, tokens};
     }
 
     std::pair<AST, Tokens> parseStatement(Tokens &tokens_)
@@ -63,16 +150,13 @@ namespace bccc
             token = tokens.front();
             tokens.pop_front();
 
-            if (token.isSymbol())
+            if (token.isSymbol(eSymbol::Semicolon))
             {
-                auto symbol = std::get<Symbol>(token.kind);
-                if (symbol.symbol == eSymbol::Semicolon)
-                {
-                    auto node = AST(Return{std::make_unique<AST>(expr)});
-                    return {node, tokens};
-                }
+                auto node = AST(Return{std::make_unique<AST>(expr)});
+                return {node, tokens};
             }
-            throw std::runtime_error("Missing semicolon");
+            std::cout << "Missing semicolon";
+            exit(0);
         }
         throw std::runtime_error("'return' keyword expected");
     }
@@ -134,7 +218,7 @@ namespace bccc
                 if (token.isSymbol(eSymbol::ClosingBrace))
                 {
                     auto node = AST(FuncDef{name, std::make_unique<AST>(statement)});
-                    return { node, tokens };
+                    return {node, tokens};
                 }
                 throw std::runtime_error("Missing closing braces");
             }

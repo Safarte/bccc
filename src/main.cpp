@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 
     auto ast = bccc::parseProgram(tokens);
 
+//    std::cout << ast;
+
     auto assembly = bccc::emitProgram(ast);
 
     std::ofstream oFile;

@@ -10,4 +10,4 @@ add_executable(bccc
         src/lexer.h
         src/main.cpp
         src/parser.h
-        src/parser.cpp src/emitter.h src/emitter.cpp src/ast.h src/token.h)
+        src/parser.cpp src/emitter.h src/emitter.cpp src/ast.h src/token.h src/ast.cpp src/token.cpp)

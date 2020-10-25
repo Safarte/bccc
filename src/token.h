@@ -3,6 +3,7 @@
 
 #include <string>
 #include <variant>
+#include <map>
 
 namespace bccc
 {
@@ -11,6 +12,8 @@ namespace bccc
         Int,
         Return
     };
+
+    std::map<int, std::string> getKeywordStr();
 
     enum class eSymbol
     {
@@ -26,6 +29,8 @@ namespace bccc
         Asterisk,
         Div
     };
+
+    std::map<int, std::string> getSymbolStr();
 
     struct Keyword
     {
@@ -68,6 +73,11 @@ namespace bccc
             return false;
         }
 
+        bool isUnaryOp() const
+        {
+            return isSymbol(eSymbol::Sub) || isSymbol(eSymbol::BitwiseNot) || isSymbol(eSymbol::LogicalNot);
+        }
+
         bool isInt() const
         {
             return kind.index() == 2;
@@ -93,6 +103,8 @@ namespace bccc
             return false;
         }
     };
+
+    std::ostream& operator<<(std::ostream &os, Token &token);
 }
 
 #endif //BCCC_TOKEN_H

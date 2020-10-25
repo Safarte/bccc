@@ -6,6 +6,18 @@
 
 namespace bccc
 {
+    std::string emitOperands(AST &op1, AST &op2)
+    {
+        std::stringstream ss;
+
+        ss << emitExpression(op1);
+        ss << "\tpush\t%rax\n";
+        ss << emitExpression(op2);
+        ss << "\tpop\t%rcx\n";
+
+        return ss.str();
+    }
+
     std::string emitExpression(AST &expression)
     {
         std::stringstream ss;
@@ -34,6 +46,32 @@ namespace bccc
                     ss << "\tcmpl\t$0, %eax\n";
                     ss << "\tmovl\t$0, %eax\n";
                     ss << "\tsete\t%al\n";
+                    break;
+            }
+        }
+
+        if (expression.isBinaryOp())
+        {
+            auto[op, lOperand, rOperand] = std::get<BinaryOp>(std::move(expression.kind));
+
+            switch(op)
+            {
+                case eBinaryOp::Add:
+                    ss << emitOperands(*lOperand, *rOperand);
+                    ss << "\taddl\t%ecx, %eax\n";
+                    break;
+                case eBinaryOp::Sub:
+                    ss << emitOperands(*rOperand, *lOperand);
+                    ss << "\tsubl\t%ecx, %eax\n";
+                    break;
+                case eBinaryOp::Mul:
+                    ss << emitOperands(*lOperand, *rOperand);
+                    ss << "\timul\t%ecx, %eax\n";
+                    break;
+                case eBinaryOp::Div:
+                    ss << emitOperands(*rOperand, *lOperand);
+                    ss << "\tcdq\n";
+                    ss << "\tidiv\t%ecx\n";
                     break;
             }
         }
