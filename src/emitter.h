@@ -16,6 +16,6 @@ namespace bccc
     std::string emitStatement(AST &statement);
     std::string emitFunction(AST &function);
     std::string emitProgram(AST &program);
-}
+} // namespace bccc
 
 #endif //BCCC_EMITTER_H

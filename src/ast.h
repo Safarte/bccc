@@ -104,7 +104,7 @@ namespace bccc
         }
     };
 
-    std::ostream& operator<<(std::ostream &os, AST &ast);
-}
+    std::ostream &operator<<(std::ostream &os, AST &ast);
+} // namespace bccc
 
 #endif //BCCC_AST_H

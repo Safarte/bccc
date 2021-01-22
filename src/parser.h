@@ -23,6 +23,6 @@ namespace bccc
     std::pair<std::vector<Identifier>, Tokens> parseArguments(Tokens &tokens_);
     std::pair<AST, Tokens> parseFunction(Tokens &tokens);
     AST parseProgram(Tokens &tokens);
-}
+} // namespace bccc
 
 #endif

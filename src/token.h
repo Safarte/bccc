@@ -118,7 +118,7 @@ namespace bccc
         }
     };
 
-    std::ostream& operator<<(std::ostream &os, Token &token);
-}
+    std::ostream &operator<<(std::ostream &os, Token &token);
+} // namespace bccc
 
 #endif //BCCC_TOKEN_H

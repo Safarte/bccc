@@ -7,12 +7,12 @@
 #include <iostream>
 #include <fstream>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     std::string fName{argv[1]};
     auto tokens = bccc::Tokenize(fName);
 
-    for (auto t: tokens)
+    for (auto t : tokens)
     {
         std::cout << t << " ";
     }

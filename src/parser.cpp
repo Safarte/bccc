@@ -18,7 +18,7 @@ namespace bccc
 
         if (token.isSymbol(eSymbol::OpeningParen))
         {
-            auto[expr, newTokens] = parseExpression(tokens);
+            auto [expr, newTokens] = parseExpression(tokens);
             tokens = newTokens;
 
             token = tokens.front();
@@ -37,21 +37,21 @@ namespace bccc
             eUnaryOp op;
             switch (symbol.symbol)
             {
-                case eSymbol::Sub:
-                    op = eUnaryOp::Minus;
-                    break;
-                case eSymbol::LogicalNot:
-                    op = eUnaryOp::LogicalNot;
-                    break;
-                case eSymbol::BitwiseNot:
-                    op = eUnaryOp::BitwiseNot;
-                    break;
-                default:
-                    std::cout << "Unknown unary operator";
-                    exit(0);
+            case eSymbol::Sub:
+                op = eUnaryOp::Minus;
+                break;
+            case eSymbol::LogicalNot:
+                op = eUnaryOp::LogicalNot;
+                break;
+            case eSymbol::BitwiseNot:
+                op = eUnaryOp::BitwiseNot;
+                break;
+            default:
+                std::cout << "Unknown unary operator";
+                exit(0);
             }
 
-            auto[factor, newTokens] = parseFactor(tokens);
+            auto [factor, newTokens] = parseFactor(tokens);
             tokens = newTokens;
 
             auto node = AST(UnaryOp{op, std::make_unique<AST>(factor)});
@@ -69,7 +69,7 @@ namespace bccc
 
     std::pair<AST, Tokens> parseTerm(Tokens &tokens_)
     {
-        auto[factor, tokens] = parseFactor(tokens_);
+        auto [factor, tokens] = parseFactor(tokens_);
 
         auto token = tokens.front();
 
@@ -81,18 +81,18 @@ namespace bccc
             eBinaryOp op;
             switch (symbol.symbol)
             {
-                case eSymbol::Asterisk:
-                    op = eBinaryOp::Mul;
-                    break;
-                case eSymbol::Div:
-                    op = eBinaryOp::Div;
-                    break;
-                default:
-                    std::cout << "Unknown binary operator";
-                    exit(0);
+            case eSymbol::Asterisk:
+                op = eBinaryOp::Mul;
+                break;
+            case eSymbol::Div:
+                op = eBinaryOp::Div;
+                break;
+            default:
+                std::cout << "Unknown binary operator";
+                exit(0);
             }
 
-            auto[nextFactor, newTokens] = parseFactor(tokens);
+            auto [nextFactor, newTokens] = parseFactor(tokens);
             tokens = newTokens;
 
             factor.setKind(BinaryOp{op, std::make_unique<AST>(factor), std::make_unique<AST>(nextFactor)});
@@ -105,7 +105,7 @@ namespace bccc
 
     std::pair<AST, Tokens> parseAddExpr(Tokens &tokens_)
     {
-        auto[term, tokens] = parseTerm(tokens_);
+        auto [term, tokens] = parseTerm(tokens_);
 
         auto token = tokens.front();
 
@@ -117,18 +117,18 @@ namespace bccc
             eBinaryOp op;
             switch (symbol.symbol)
             {
-                case eSymbol::Add:
-                    op = eBinaryOp::Add;
-                    break;
-                case eSymbol::Sub:
-                    op = eBinaryOp::Sub;
-                    break;
-                default:
-                    std::cout << "Unknown binary operator";
-                    exit(0);
+            case eSymbol::Add:
+                op = eBinaryOp::Add;
+                break;
+            case eSymbol::Sub:
+                op = eBinaryOp::Sub;
+                break;
+            default:
+                std::cout << "Unknown binary operator";
+                exit(0);
             }
 
-            auto[nextTerm, newTokens] = parseTerm(tokens);
+            auto [nextTerm, newTokens] = parseTerm(tokens);
             tokens = newTokens;
 
             term.setKind(BinaryOp{op, std::make_unique<AST>(term), std::make_unique<AST>(nextTerm)});
@@ -141,7 +141,7 @@ namespace bccc
 
     std::pair<AST, Tokens> parseRelExpr(Tokens &tokens_)
     {
-        auto[addExpr, tokens] = parseAddExpr(tokens_);
+        auto [addExpr, tokens] = parseAddExpr(tokens_);
 
         auto token = tokens.front();
 
@@ -154,24 +154,24 @@ namespace bccc
             eBinaryOp op;
             switch (symbol.symbol)
             {
-                case eSymbol::Lt:
-                    op = eBinaryOp::Lt;
-                    break;
-                case eSymbol::Le:
-                    op = eBinaryOp::Le;
-                    break;
-                case eSymbol::Gt:
-                    op = eBinaryOp::Gt;
-                    break;
-                case eSymbol::Ge:
-                    op = eBinaryOp::Ge;
-                    break;
-                default:
-                    std::cout << "Unknown binary operator";
-                    exit(0);
+            case eSymbol::Lt:
+                op = eBinaryOp::Lt;
+                break;
+            case eSymbol::Le:
+                op = eBinaryOp::Le;
+                break;
+            case eSymbol::Gt:
+                op = eBinaryOp::Gt;
+                break;
+            case eSymbol::Ge:
+                op = eBinaryOp::Ge;
+                break;
+            default:
+                std::cout << "Unknown binary operator";
+                exit(0);
             }
 
-            auto[nextAddExpr, newTokens] = parseAddExpr(tokens);
+            auto [nextAddExpr, newTokens] = parseAddExpr(tokens);
             tokens = newTokens;
 
             addExpr.setKind(BinaryOp{op, std::make_unique<AST>(addExpr), std::make_unique<AST>(nextAddExpr)});
@@ -184,7 +184,7 @@ namespace bccc
 
     std::pair<AST, Tokens> parseEqExpr(Tokens &tokens_)
     {
-        auto[relExpr, tokens] = parseRelExpr(tokens_);
+        auto [relExpr, tokens] = parseRelExpr(tokens_);
 
         auto token = tokens.front();
 
@@ -196,18 +196,18 @@ namespace bccc
             eBinaryOp op;
             switch (symbol.symbol)
             {
-                case eSymbol::Eq:
-                    op = eBinaryOp::Eq;
-                    break;
-                case eSymbol::Ne:
-                    op = eBinaryOp::Ne;
-                    break;
-                default:
-                    std::cout << "Unknown binary operator";
-                    exit(0);
+            case eSymbol::Eq:
+                op = eBinaryOp::Eq;
+                break;
+            case eSymbol::Ne:
+                op = eBinaryOp::Ne;
+                break;
+            default:
+                std::cout << "Unknown binary operator";
+                exit(0);
             }
 
-            auto[nextRelExpr, newTokens] = parseRelExpr(tokens);
+            auto [nextRelExpr, newTokens] = parseRelExpr(tokens);
             tokens = newTokens;
 
             relExpr.setKind(BinaryOp{op, std::make_unique<AST>(relExpr), std::make_unique<AST>(nextRelExpr)});
@@ -220,7 +220,7 @@ namespace bccc
 
     std::pair<AST, Tokens> parseAndExpr(Tokens &tokens_)
     {
-        auto[eqExpr, tokens] = parseEqExpr(tokens_);
+        auto [eqExpr, tokens] = parseEqExpr(tokens_);
 
         auto token = tokens.front();
 
@@ -230,7 +230,7 @@ namespace bccc
 
             auto op = eBinaryOp::LAnd;
 
-            auto[nextEqExpr, newTokens] = parseEqExpr(tokens);
+            auto [nextEqExpr, newTokens] = parseEqExpr(tokens);
             tokens = newTokens;
 
             eqExpr.setKind(BinaryOp{op, std::make_unique<AST>(eqExpr), std::make_unique<AST>(nextEqExpr)});
@@ -243,10 +243,9 @@ namespace bccc
 
     std::pair<AST, Tokens> parseExpression(Tokens &tokens_)
     {
-        auto[andExpr, tokens] = parseAndExpr(tokens_);
+        auto [andExpr, tokens] = parseAndExpr(tokens_);
 
         auto token = tokens.front();
-
 
         while (token.isSymbol(eSymbol::LogicalOr))
         {
@@ -254,7 +253,7 @@ namespace bccc
 
             auto op = eBinaryOp::LOr;
 
-            auto[nextAndExpr, newTokens] = parseAndExpr(tokens);
+            auto [nextAndExpr, newTokens] = parseAndExpr(tokens);
             tokens = newTokens;
 
             andExpr.setKind(BinaryOp{op, std::make_unique<AST>(andExpr), std::make_unique<AST>(nextAndExpr)});
@@ -271,9 +270,9 @@ namespace bccc
         Token token = tokens.front();
         tokens.pop_front();
 
-        if (token.isKeyword(eKeyword::Return))  // Token is a Keyword
+        if (token.isKeyword(eKeyword::Return)) // Token is a Keyword
         {
-            auto[expr, newTokens] = parseExpression(tokens);
+            auto [expr, newTokens] = parseExpression(tokens);
             tokens = newTokens;
 
             token = tokens.front();
@@ -334,7 +333,7 @@ namespace bccc
             auto identifier = std::get<Identifier>(token.kind);
             std::string name = identifier.identifier;
 
-            auto[args, newTokens] = parseArguments(tokens);
+            auto [args, newTokens] = parseArguments(tokens);
             tokens = newTokens;
 
             token = tokens.front();
@@ -342,7 +341,7 @@ namespace bccc
 
             if (token.isSymbol(eSymbol::OpeningBrace))
             {
-                auto[statement, newTokens] = parseStatement(tokens);
+                auto [statement, newTokens] = parseStatement(tokens);
                 tokens = newTokens;
 
                 token = tokens.front();
@@ -366,7 +365,7 @@ namespace bccc
     AST parseProgram(Tokens &tokens_)
     {
         auto tokens = tokens_;
-        auto[ast, newTokens] = parseFunction(tokens);
+        auto [ast, newTokens] = parseFunction(tokens);
         tokens = newTokens;
 
         if (!tokens.empty())
@@ -377,4 +376,4 @@ namespace bccc
 
         return ast;
     }
-}
+} // namespace bccc

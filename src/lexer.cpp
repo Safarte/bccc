@@ -172,7 +172,8 @@ namespace bccc
                 }
                 tokens.push_back(getToken(ch, line));
                 continue;
-            } else if (opStarts.find(ch) != opStarts.end())
+            }
+            else if (opStarts.find(ch) != opStarts.end())
             {
                 if (!buffer.empty() && !(opStarts.find(buffer) != opStarts.end()))
                 {
@@ -181,12 +182,14 @@ namespace bccc
                 }
                 buffer += ch;
                 continue;
-            } else if (opEnds.find(ch) != opEnds.end())
+            }
+            else if (opEnds.find(ch) != opEnds.end())
             {
                 buffer += ch;
                 tokens.push_back(getToken(buffer, line));
                 buffer = "";
-            } else if (whitespace.find(ch) != whitespace.end())
+            }
+            else if (whitespace.find(ch) != whitespace.end())
             {
                 if (!buffer.empty())
                 {
@@ -194,13 +197,15 @@ namespace bccc
                     buffer = "";
                 }
                 continue;
-            } else if (opStarts.find(buffer) != opStarts.end())
+            }
+            else if (opStarts.find(buffer) != opStarts.end())
             {
                 tokens.push_back(getToken(buffer, line));
                 buffer = "";
                 buffer += ch;
                 continue;
-            } else
+            }
+            else
             {
                 buffer += ch;
             }

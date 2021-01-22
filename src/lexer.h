@@ -13,6 +13,6 @@ namespace bccc
     std::deque<Token> Tokenize(const std::string &filename);
 
     Token getToken(const std::string &buffer, LineNo line);
-}
+} // namespace bccc
 
 #endif
