@@ -33,7 +33,13 @@ namespace bccc
         Lt,
         Le,
         Gt,
-        Ge
+        Ge,
+        Mod,
+        And,
+        Or,
+        Xor,
+        Shl,
+        Shr
     };
 
     std::map<int, std::string> getBinaryOpChar();
