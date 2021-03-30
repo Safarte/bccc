@@ -14,8 +14,8 @@ namespace bccc
     std::pair<std::string, int> emitExpression(AST &expression, int counter = 0);
     std::string emitReturn(AST &ret);
     std::string emitStatement(AST &statement);
-    std::string emitFunction(AST &function);
-    std::string emitProgram(AST &program);
+    std::string emitFunction(AST& function);
+    std::string emitProgram(AST& program);
 } // namespace bccc
 
 #endif //BCCC_EMITTER_H

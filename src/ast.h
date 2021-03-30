@@ -1,13 +1,13 @@
 #ifndef BCCC_AST_H
 #define BCCC_AST_H
 
-#include "token.h"
-
+#include <utility>
 #include <variant>
 #include <string>
 #include <memory>
 #include <iostream>
 #include <map>
+#include <vector>
 
 namespace bccc
 {
@@ -44,70 +44,138 @@ namespace bccc
 
     std::map<int, std::string> getBinaryOpChar();
 
-    struct AST;
-
-    struct FuncDef
+    enum class eASTNodeType
     {
-        std::string name;
-        std::unique_ptr<AST> body;
+        FuncDef,
+        Int,
+        UnaryOp,
+        BinaryOp,
+        Return,
+        Var,
+        Assign,
+        Declare
     };
-
-    struct UnaryOp
-    {
-        eUnaryOp op;
-        std::unique_ptr<AST> operand;
-    };
-
-    struct BinaryOp
-    {
-        eBinaryOp op;
-        std::unique_ptr<AST> leftOperand;
-        std::unique_ptr<AST> rightOperand;
-    };
-
-    struct Return
-    {
-        std::unique_ptr<AST> expression;
-    };
-
-    using ASTKind = std::variant<FuncDef, Int, UnaryOp, BinaryOp, Return>;
 
     struct AST
     {
-        ASTKind kind;
+        std::optional<eASTNodeType> type;
 
-        AST() = delete;
+        AST() = default;
 
-        explicit AST(ASTKind kind_) : kind(std::move(kind_)) {}
+        AST(AST &) = default;
 
-        AST(AST &ast_) : kind(std::move(ast_.kind)) {}
+    protected:
+        explicit AST(eASTNodeType type_) : type(type_) {}
 
-        void setKind(ASTKind kind_);
-
-        bool isFuncDef() const
+    public:
+        [[nodiscard]] virtual bool isFuncDef() const
         {
-            return kind.index() == 0;
+            return type == eASTNodeType::FuncDef;
         }
 
-        bool isInt() const
+        [[nodiscard]] virtual bool isInt() const
         {
-            return kind.index() == 1;
+            return type == eASTNodeType::Int;
         }
 
-        bool isUnaryOp() const
+        [[nodiscard]] virtual bool isUnaryOp() const
         {
-            return kind.index() == 2;
+            return type == eASTNodeType::UnaryOp;
         }
 
-        bool isBinaryOp() const
+        [[nodiscard]] virtual bool isBinaryOp() const
         {
-            return kind.index() == 3;
+            return type == eASTNodeType::BinaryOp;
         }
 
-        bool isReturn() const
+        [[nodiscard]] virtual bool isReturn() const
         {
-            return kind.index() == 4;
+            return type == eASTNodeType::Return;
         }
+
+        [[nodiscard]] virtual bool isVar() const
+        {
+            return type == eASTNodeType::Var;
+        }
+
+        [[nodiscard]] virtual bool isAssign() const
+        {
+            return type == eASTNodeType::Assign;
+        }
+
+        [[nodiscard]] virtual bool isDeclare() const
+        {
+            return type == eASTNodeType::Declare;
+        }
+    };
+
+    struct FuncDef : AST
+    {
+        std::string name;
+        std::vector<AST *> body;
+
+        FuncDef(std::string &name_, std::vector<AST *> body_) : name(name_), body(std::move(body_)),
+                                                                AST(eASTNodeType::FuncDef) {}
+
+    };
+
+    struct IntLit : AST
+    {
+        int value;
+
+        explicit IntLit(int value_) : value(value_), AST(eASTNodeType::Int) {}
+    };
+
+    struct UnaryOp : AST
+    {
+        eUnaryOp op;
+        AST* operand;
+
+        UnaryOp(eUnaryOp op_, AST* operand_) : op(op_), operand(operand_), AST(eASTNodeType::UnaryOp) {}
+    };
+
+    struct BinaryOp : AST
+    {
+        eBinaryOp op;
+        AST* leftOperand;
+        AST* rightOperand;
+
+        BinaryOp(eBinaryOp op_, AST *left_, AST *right_) : op(op_), leftOperand(left_), rightOperand(right_),
+                                                           AST(eASTNodeType::BinaryOp) {}
+    };
+
+    struct Return : AST
+    {
+        AST* expression;
+
+        explicit Return(AST *expression_) : expression(expression_), AST(eASTNodeType::Return) {}
+    };
+
+    struct Var : AST
+    {
+        std::string name;
+
+        explicit Var(std::string &name_) : name(name_), AST(eASTNodeType::Var) {}
+    };
+
+    struct Assign : AST
+    {
+        std::string varName;
+        AST* expression;
+
+        Assign(std::string &varName_, AST *expression_) : varName(varName_), expression(expression_),
+                                                          AST(eASTNodeType::Assign) {}
+    };
+
+    struct Declare : AST
+    {
+        std::string varName;
+        std::optional<AST*> expression;
+
+        explicit Declare(std::string &name_) : varName(name_), AST(eASTNodeType::Declare) {}
+
+        Declare(std::string &name_, AST *expression_) : varName(name_), expression(expression_),
+                                                        AST(eASTNodeType::Declare) {}
     };
 
     std::ostream &operator<<(std::ostream &os, AST &ast);

@@ -1,7 +1,6 @@
-#include "ast.h"
-
 #include <iostream>
 #include <map>
+#include "token.h"
 
 namespace bccc
 {
@@ -39,7 +38,8 @@ namespace bccc
             {21, "|"},
             {22, "^"},
             {23, "<<"},
-            {24, ">>"}};
+            {24, ">>"},
+            {25, "="}};
     }
 
     std::ostream &operator<<(std::ostream &os, Token &token)

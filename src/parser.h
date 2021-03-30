@@ -12,21 +12,22 @@ using Tokens = std::deque<bccc::Token>;
 
 namespace bccc
 {
-    std::pair<AST, Tokens> parseFactor(Tokens &tokens);
-    std::pair<AST, Tokens> parseTerm(Tokens &tokens);
-    std::pair<AST, Tokens> parseAddExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseShiftExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseRelExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseEqExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseAndExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseXorExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseOrExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseLAndExpr(Tokens &tokens);
-    std::pair<AST, Tokens> parseExpression(Tokens &tokens);
-    std::pair<AST, Tokens> parseStatement(Tokens &tokens);
-    std::pair<std::vector<Identifier>, Tokens> parseArguments(Tokens &tokens_);
-    std::pair<AST, Tokens> parseFunction(Tokens &tokens);
-    AST parseProgram(Tokens &tokens);
+    AST * parseFactor(Tokens &tokens);
+    AST * parseTerm(Tokens &tokens);
+    AST * parseAddExpr(Tokens &tokens);
+    AST * parseShiftExpr(Tokens &tokens);
+    AST * parseRelExpr(Tokens &tokens);
+    AST * parseEqExpr(Tokens &tokens);
+    AST * parseAndExpr(Tokens &tokens);
+    AST * parseXorExpr(Tokens &tokens);
+    AST * parseOrExpr(Tokens &tokens);
+    AST * parseLAndExpr(Tokens &tokens);
+    AST * parseLOrExpr(Tokens &tokens);
+    AST * parseExpression(Tokens &tokens);
+    AST * parseStatement(Tokens &tokens);
+    std::vector<Identifier> parseArguments(Tokens &tokens);
+    AST * parseFunction(Tokens &tokens);
+    AST * parseProgram(Tokens &tokens);
 } // namespace bccc
 
 #endif

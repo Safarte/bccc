@@ -41,7 +41,8 @@ namespace bccc
         Or,
         Xor,
         Shl,
-        Shr
+        Shr,
+        Assign
     };
 
     std::map<int, std::string> getSymbolStr();

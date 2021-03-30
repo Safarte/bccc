@@ -42,48 +42,37 @@ namespace bccc
         auto mUnaryOp = getUnaryOpChar();
         auto mBinaryOp = getBinaryOpChar();
 
-        switch (ast.kind.index())
+        if (ast.isFuncDef())
         {
-        case 0: // FuncDef
-        {
-            auto [name, body] = std::get<FuncDef>(std::move(ast.kind));
-            os << "FUN " << name << ":\n";
+            auto function = dynamic_cast<FuncDef*>(&ast);
+            os << "FUN " << function->name << ":\n";
             os << "\tbody:\n";
-            os << "\t\t" << *body << "\n";
-            break;
+            for (auto statement: function->body)
+            {
+                os << "\t\t" << *statement << "\n";
+            }
         }
-        case 1: // Int
+        if (ast.isReturn())
         {
-            auto [n] = std::get<Int>(std::move(ast.kind));
-            os << "Int<" << n << ">";
-            break;
+            auto statement = dynamic_cast<Return*>(&ast);
+            os << "RETURN " << *statement->expression;
         }
-        case 2: // UnaryOp
+        if (ast.isBinaryOp())
         {
-            auto [op, expr] = std::get<UnaryOp>(std::move(ast.kind));
-            os << mUnaryOp[(int)op] << *expr;
-            break;
+            auto expr = dynamic_cast<BinaryOp*>(&ast);
+            os << "(" << *expr->leftOperand << " " << mBinaryOp[(int)expr->op] << " " << *expr->rightOperand << ")";
         }
-        case 3: // BinaryOp
+        if (ast.isUnaryOp())
         {
-            auto [op, lExpr, rExpr] = std::get<BinaryOp>(std::move(ast.kind));
-            os << "(" << *lExpr << " " << mBinaryOp[(int)op] << " " << *rExpr << ")";
-            break;
+            auto expr = dynamic_cast<UnaryOp*>(&ast);
+            os << mUnaryOp[(int)expr->op] << *expr->operand;
         }
-        case 4: // Return
+        if (ast.isInt())
         {
-            auto [expr] = std::get<Return>(std::move(ast.kind));
-            os << "RETURN " << *expr;
-            break;
+            auto lit = dynamic_cast<IntLit*>(&ast);
+            os << "Int<" << lit->value << ">";
         }
-        default:
-            break;
-        }
-        return os;
-    }
 
-    void AST::setKind(ASTKind kind_)
-    {
-        kind = std::move(kind_);
+        return os;
     }
 } // namespace bccc

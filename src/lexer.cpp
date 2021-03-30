@@ -119,6 +119,10 @@ namespace bccc
         {
             return Token(Symbol{eSymbol::Shr});
         }
+        if (buffer == "=")
+        {
+            return Token(Symbol{eSymbol::Assign});
+        }
         if (std::regex_match(buffer, std::regex("[a-zA-Z][a-zA-Z0-9_]*")))
         {
             return Token(Identifier{buffer});
