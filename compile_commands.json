@@ -1,0 +1,92 @@
+[
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/lexer.o",
+   "src/lexer.cpp"
+  ],
+  "file": "src/lexer.cpp"
+ },
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/ast.o",
+   "src/ast.cpp"
+  ],
+  "file": "src/ast.cpp"
+ },
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/main.o",
+   "src/main.cpp"
+  ],
+  "file": "src/main.cpp"
+ },
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/token.o",
+   "src/token.cpp"
+  ],
+  "file": "src/token.cpp"
+ },
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/emitter.o",
+   "src/emitter.cpp"
+  ],
+  "file": "src/emitter.cpp"
+ },
+ {
+  "directory": "/home/safarte/Projects/CPP/bccc",
+  "arguments": [
+   "g++",
+   "-g",
+   "-std=c++2a",
+   "-I",
+   "include",
+   "-c",
+   "-o",
+   "build/parser.o",
+   "src/parser.cpp"
+  ],
+  "file": "src/parser.cpp"
+ }
+]
