@@ -13,12 +13,11 @@ int main(int argc, char *argv[]) {
   auto ast = bccc::parseProgram(tokens);
   auto assembly = bccc::emitProgram(*ast);
 
-  //    std::cout << std::ifstream(fName, std::ios::in).rdbuf() << "\n\n";
-  //    for (auto t : tokens)
-  //    {
-  //        std::cout << t << " ";
-  //    }
-  //    std::cout << "\n\n" << *ast << "\n\n" << assembly;
+  // std::cout << std::ifstream(fName, std::ios::in).rdbuf() << "\n\n";
+  // for (auto t : tokens) {
+  //   std::cout << t << " ";
+  // }
+  // std::cout << "\n\n" << *ast << "\n\n" << assembly;
 
   std::ofstream oFile;
   oFile.open("/tmp/asm.s");

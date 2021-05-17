@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <string>
 #include <unordered_set>
 
 namespace bccc {
@@ -124,46 +125,41 @@ std::deque<Token> Tokenize(const std::string &filename) {
   std::deque<Token> tokens;
   const std::unordered_set<std::string> delims = {"{", "}", "(", ")", ";"};
   const std::unordered_set<std::string> whitespace = {"\n", "\r", "\t", " "};
-  const std::unordered_set<std::string> singleOperators = {};
+  const std::unordered_set<std::string> ops = {
+      "+",  "-",  "*",  "/",  "&",  "|",   "^",   "%",  "~",  "=",
+      "!",  "<<", ">>", "<=", ">=", "==",  "!=",  "&&", "||", "+=",
+      "-=", "*=", "/=", "%=", "~=", "<<=", ">>=", "&=", "|=", "^="};
+  const std::unordered_set<std::string> opParts = {
+      "+", "-", "*", "/", "%", "&", "|", "^", "~", "=", "<", ">", "!"};
   const std::unordered_set<std::string> opStarts = {
       "<", ">", "!", "&", "|", "=", "+", "-", "*", "/", "~", "%", "^"};
   const std::unordered_set<std::string> opEnds = {"=", "&", "|", "<", ">"};
 
   while (file >> std::noskipws >> ch_) {
-    std::string ch(1, ch_);
+    const std::string ch(1, ch_);
+    const std::string nextBuffer = buffer + ch;
+
     if (ch == "\n" || ch == "\r")
       line += 1;
 
-    if (delims.find(ch) != delims.end() ||
-        singleOperators.find(ch) != singleOperators.end()) {
+    if (delims.find(ch) != delims.end()) {
       if (!buffer.empty()) {
         tokens.push_back(getToken(buffer, line));
         buffer = "";
       }
       tokens.push_back(getToken(ch, line));
       continue;
-    } else if (opStarts.find(ch) != opStarts.end()) {
-      if (!buffer.empty() && !(opStarts.find(buffer) != opStarts.end())) {
-        tokens.push_back(getToken(buffer, line));
-        buffer = "";
-      }
-      buffer += ch;
-      continue;
-    } else if (opEnds.find(ch) != opEnds.end()) {
-      buffer += ch;
-      tokens.push_back(getToken(buffer, line));
-      buffer = "";
     } else if (whitespace.find(ch) != whitespace.end()) {
       if (!buffer.empty()) {
         tokens.push_back(getToken(buffer, line));
         buffer = "";
       }
       continue;
-    } else if (opStarts.find(buffer) != opStarts.end()) {
+    } else if (ops.find(nextBuffer) != ops.end()) {
+      buffer = nextBuffer;
+    } else if (ops.find(buffer) != ops.end() || ops.find(ch) != ops.end()) {
       tokens.push_back(getToken(buffer, line));
-      buffer = "";
-      buffer += ch;
-      continue;
+      buffer = ch;
     } else {
       buffer += ch;
     }
