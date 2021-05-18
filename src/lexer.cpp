@@ -94,6 +94,45 @@ Token getToken(const std::string &buffer, LineNo line) {
   if (buffer == "=") {
     return Token(Symbol{eSymbol::Assign});
   }
+  if (buffer == "+=") {
+    return Token(Symbol{eSymbol::AssignAdd});
+  }
+  if (buffer == "-=") {
+    return Token(Symbol{eSymbol::AssignSub});
+  }
+  if (buffer == "*=") {
+    return Token(Symbol{eSymbol::AssignMul});
+  }
+  if (buffer == "/=") {
+    return Token(Symbol{eSymbol::AssignDiv});
+  }
+  if (buffer == "%=") {
+    return Token(Symbol{eSymbol::AssignMod});
+  }
+  if (buffer == "<<=") {
+    return Token(Symbol{eSymbol::AssignShl});
+  }
+  if (buffer == ">>=") {
+    return Token(Symbol{eSymbol::AssignShr});
+  }
+  if (buffer == "&=") {
+    return Token(Symbol{eSymbol::AssignAnd});
+  }
+  if (buffer == "|=") {
+    return Token(Symbol{eSymbol::AssignOr});
+  }
+  if (buffer == "^=") {
+    return Token(Symbol{eSymbol::AssignXor});
+  }
+  if (buffer == ",") {
+    return Token(Symbol{eSymbol::Comma});
+  }
+  if (buffer == "++") {
+    return Token(Symbol{eSymbol::Inc});
+  }
+  if (buffer == "--") {
+    return Token(Symbol{eSymbol::Dec});
+  }
   if (std::regex_match(buffer, std::regex("[a-zA-Z][a-zA-Z0-9_]*"))) {
     return Token(Identifier{buffer});
   }
@@ -126,14 +165,9 @@ std::deque<Token> Tokenize(const std::string &filename) {
   const std::unordered_set<std::string> delims = {"{", "}", "(", ")", ";"};
   const std::unordered_set<std::string> whitespace = {"\n", "\r", "\t", " "};
   const std::unordered_set<std::string> ops = {
-      "+",  "-",  "*",  "/",  "&",  "|",   "^",   "%",  "~",  "=",
-      "!",  "<<", ">>", "<=", ">=", "==",  "!=",  "&&", "||", "+=",
-      "-=", "*=", "/=", "%=", "~=", "<<=", ">>=", "&=", "|=", "^="};
-  const std::unordered_set<std::string> opParts = {
-      "+", "-", "*", "/", "%", "&", "|", "^", "~", "=", "<", ">", "!"};
-  const std::unordered_set<std::string> opStarts = {
-      "<", ">", "!", "&", "|", "=", "+", "-", "*", "/", "~", "%", "^"};
-  const std::unordered_set<std::string> opEnds = {"=", "&", "|", "<", ">"};
+      "+",  "-",  "*",   "/",   "&",  "|",  "^",  "%",  "~",  "=",  "!",
+      "<<", ">>", "<=",  ">=",  "==", "!=", "&&", "||", "+=", "-=", "*=",
+      "/=", "%=", "<<=", ">>=", "&=", "|=", "^=", ",",  "++", "--"};
 
   while (file >> std::noskipws >> ch_) {
     const std::string ch(1, ch_);

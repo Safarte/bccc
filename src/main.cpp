@@ -9,15 +9,16 @@
 
 int main(int argc, char *argv[]) {
   std::string fName{argv[1]};
+  std::cout << std::ifstream(fName, std::ios::in).rdbuf() << "\n\n";
+
   auto tokens = bccc::Tokenize(fName);
+  for (auto t : tokens) {
+    std::cout << t << " ";
+  }
+
   auto ast = bccc::parseProgram(tokens);
   auto assembly = bccc::emitProgram(*ast);
-
-  // std::cout << std::ifstream(fName, std::ios::in).rdbuf() << "\n\n";
-  // for (auto t : tokens) {
-  //   std::cout << t << " ";
-  // }
-  // std::cout << "\n\n" << *ast << "\n\n" << assembly;
+  std::cout << "\n\n" << *ast << "\n\n" << assembly;
 
   std::ofstream oFile;
   oFile.open("/tmp/asm.s");

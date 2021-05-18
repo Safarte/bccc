@@ -1,6 +1,7 @@
 #ifndef BCCC_TOKEN_H
 #define BCCC_TOKEN_H
 
+#include "ast.hpp"
 #include <map>
 #include <string>
 #include <variant>
@@ -36,7 +37,20 @@ enum class eSymbol {
   Xor,
   Shl,
   Shr,
-  Assign
+  Assign,
+  AssignAdd,
+  AssignSub,
+  AssignMul,
+  AssignDiv,
+  AssignMod,
+  AssignShl,
+  AssignShr,
+  AssignAnd,
+  AssignOr,
+  AssignXor,
+  Comma,
+  Inc,
+  Dec
 };
 
 std::map<int, std::string> getSymbolStr();
