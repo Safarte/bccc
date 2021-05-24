@@ -5,8 +5,13 @@
 #include <string>
 
 namespace bccc {
-std::map<int, char> getUnaryOpChar() {
-  return std::map<int, char>{{0, '-'}, {1, '~'}, {2, '!'}};
+std::map<int, std::string> getPostfixOpChar() {
+  return std::map<int, std::string>{{0, "++"}, {1, "--"}};
+}
+
+std::map<int, std::string> getUnaryOpChar() {
+  return std::map<int, std::string>{{0, "+"}, {1, "-"},  {2, "~"},
+                                    {3, "!"}, {4, "++"}, {5, "--"}};
 }
 
 std::map<int, std::string> getBinaryOpChar() {

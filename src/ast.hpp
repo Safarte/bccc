@@ -10,9 +10,13 @@
 #include <vector>
 
 namespace bccc {
-enum class eUnaryOp { Minus, BitwiseNot, LogicalNot };
+enum class ePostfixOp { Inc, Dec };
 
-std::map<int, char> getUnaryOpChar();
+std::map<int, std::string> getPostfixOpChar();
+
+enum class eUnaryOp { Plus, Minus, BitwiseNot, LogicalNot };
+
+std::map<int, std::string> getUnaryOpChar();
 
 enum class eBinaryOp {
   Add,

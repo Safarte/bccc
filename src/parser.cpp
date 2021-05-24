@@ -29,6 +29,9 @@ AST *parseFactor(Tokens &tokens) {
     auto symbol = std::get<Symbol>(token.kind);
     eUnaryOp op;
     switch (symbol.symbol) {
+    case eSymbol::Add:
+      op = eUnaryOp::Plus;
+      break;
     case eSymbol::Sub:
       op = eUnaryOp::Minus;
       break;
@@ -48,6 +51,37 @@ AST *parseFactor(Tokens &tokens) {
     AST *node = new UnaryOp{op, factor};
     return node;
   }
+  if (token.isPrefixOp()) {
+    auto symbol = std::get<Symbol>(token.kind);
+    eBinaryOp op;
+    switch (symbol.symbol) {
+    case eSymbol::Inc:
+      op = eBinaryOp::Add;
+      break;
+    case eSymbol::Dec:
+      op = eBinaryOp::Sub;
+      break;
+    default:
+      std::cout << "Unknown prefix operator";
+      exit(0);
+    }
+
+    Token token = tokens.front();
+
+    if (token.isIdentifier()) {
+      tokens.pop_front();
+      auto name = std::get<Identifier>(token.kind);
+
+      AST *node =
+          new Assign{name.identifier,
+                     new BinaryOp{op, new Var{name.identifier}, new IntLit{1}}};
+      return node;
+    }
+
+    std::cout << "Expression is not assignable";
+    exit(0);
+  }
+
   if (token.isInt()) {
     auto value = std::get<Int>(token.kind);
     AST *node = new IntLit{value.n};
@@ -344,7 +378,7 @@ AST *parseLOrExpr(Tokens &tokens) {
   return lAndExpr;
 }
 
-AST *parseExpression(Tokens &tokens) {
+AST *parseAssignExpr(Tokens &tokens) {
   Token token = tokens.front();
 
   if (token.isIdentifier()) {
@@ -358,12 +392,118 @@ AST *parseExpression(Tokens &tokens) {
 
     if (token.isSymbol(eSymbol::Assign)) {
       tokens = tempTokens;
-      auto expr = parseExpression(tokens);
+      auto expr = parseAssignExpr(tokens);
       AST *node = new Assign{name.identifier, expr};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignAdd)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Add, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignSub)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Sub, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignMul)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Mul, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignDiv)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Div, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignMod)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Mod, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignShl)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Shl, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignShr)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Shr, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignAnd)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::And, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignOr)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Or, new Var{name.identifier}, expr}};
+      return node;
+    }
+
+    if (token.isSymbol(eSymbol::AssignXor)) {
+      tokens = tempTokens;
+      auto expr = parseAssignExpr(tokens);
+      AST *node = new Assign{
+          name.identifier,
+          new BinaryOp{eBinaryOp::Xor, new Var{name.identifier}, expr}};
       return node;
     }
   }
   return parseLOrExpr(tokens);
+}
+
+AST *parseExpression(Tokens &tokens) {
+  auto assignExpr = parseAssignExpr(tokens);
+
+  auto token = tokens.front();
+
+  while (token.isSymbol(eSymbol::Comma)) {
+    tokens.pop_front();
+
+    assignExpr = parseAssignExpr(tokens);
+
+    token = tokens.front();
+  }
+
+  return assignExpr;
 }
 
 AST *parseStatement(Tokens &tokens) {

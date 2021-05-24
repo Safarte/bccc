@@ -22,6 +22,7 @@ AST *parseXorExpr(Tokens &tokens);
 AST *parseOrExpr(Tokens &tokens);
 AST *parseLAndExpr(Tokens &tokens);
 AST *parseLOrExpr(Tokens &tokens);
+AST *parseAssignExpr(Tokens &tokens);
 AST *parseExpression(Tokens &tokens);
 AST *parseStatement(Tokens &tokens);
 std::vector<Identifier> parseArguments(Tokens &tokens);

@@ -87,8 +87,12 @@ struct Token {
   }
 
   bool isUnaryOp() const {
-    return isSymbol(eSymbol::Sub) || isSymbol(eSymbol::BitwiseNot) ||
-           isSymbol(eSymbol::LogicalNot);
+    return isSymbol(eSymbol::Add) || isSymbol(eSymbol::Sub) ||
+           isSymbol(eSymbol::BitwiseNot) || isSymbol(eSymbol::LogicalNot);
+  }
+
+  bool isPrefixOp() const {
+    return isSymbol(eSymbol::Inc) || isSymbol(eSymbol::Dec);
   }
 
   bool isInt() const { return kind.index() == 2; }
